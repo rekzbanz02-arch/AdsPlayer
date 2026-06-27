@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ceb">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🐷 Baboy Para Ibaligya!</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
+
+    /* ── DESIGN TOKENS ── */
+    :root {
+      --bg:        #f4f4f0;       /* warm off-white page */
+      --surface:   #ffffff;       /* card faces */
+      --surface2:  #f9f9f7;       /* nested / alternate */
+      --border:    #e2e0d8;       /* subtle borders */
+      --border2:   #ccc9be;       /* dividers */
+      --red:       #c0392b;
+      --red-dark:  #922b21;
+      --red-light: #fde8e6;
+      --yellow:    #e67e22;
+      --yellow-bg: #fef9f0;
+      --green:     #1a7a3f;
+      --green-bg:  #edf7f1;
+      --blue:      #1a5fa8;
+      --blue-bg:   #eaf1fb;
+      --text-h:    #111110;       /* headings */
+      --text-b:    #2c2b28;       /* body */
+      --text-m:    #5a5850;       /* muted */
+      --text-xs:   #9a9488;       /* extra muted */
+      --shadow-s:  0 1px 4px rgba(0,0,0,.08);
+      --shadow-m:  0 4px 16px rgba(0,0,0,.1);
+      --shadow-l:  0 8px 32px rgba(0,0,0,.14);
+      --radius:    16px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-b);
+      overflow-x: hidden;
+    }
+
+    /* ─────────────────────────────────────────────
+       HEADER
+    ───────────────────────────────────────────── */
+    #header {
+      background: linear-gradient(150deg, var(--red) 0%, var(--red-dark) 100%);
+      padding: 18px 16px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #header::before {
+      content:'';
+      position:absolute;inset:0;
+      background: repeating-linear-gradient(
+        45deg,transparent,transparent 14px,
+        rgba(255,255,255,.04) 14px,rgba(255,255,255,.04) 28px
+      );
+    }
+    #header .sub {
+      font-size:10px; font-weight:700; letter-spacing:.22em;
+      color:rgba(255,255,255,.75); text-transform:uppercase; position:relative;
+      margin-bottom:4px;
+    }
+    #header h1  { font-size:28px; font-weight:900; color:#fff; position:relative; line-height:1.15; }
+    #header h1 span { color:#fcd34d; }
+    .live-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      background:rgba(0,0,0,.25); border:1.5px solid rgba(255,255,255,.35);
+      font-size:9px; font-weight:700; letter-spacing:.18em; color:#fff;
+      padding:4px 12px; border-radius:20px; margin-top:8px;
+      text-transform:uppercase; position:relative;
+    }
+    .live-dot { width:6px;height:6px;background:#fcd34d;border-radius:50%;animation:blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1}50%{opacity:.25} }
+
+    /* ─────────────────────────────────────────────
+       VIDEO
+    ───────────────────────────────────────────── */
+    #video-wrap {
+      position: relative;
+      width: 100%;
+      height: 50vh;
+      background: #000;
+      overflow: hidden;
+    }
+    #video-wrap iframe {
+      position: absolute; left: 0; width: 100%;
+      top: -44px; height: calc(100% + 88px);
+      border: none; z-index: 1;
+    }
+    #tap-block {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 44px; z-index: 2; background: #000;
+    }
+    #fs-btn {
+      position: absolute; bottom: 12px; right: 12px; z-index: 3;
+      background: var(--red); color: #fff; border: none;
+      border-radius: 10px; padding: 9px 14px;
+      font-size: 12px; font-weight: 700; font-family: 'Poppins', sans-serif;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      box-shadow: 0 4px 16px rgba(192,57,43,.55);
+      animation: pulse-btn 2s infinite;
+    }
+    @keyframes pulse-btn {
+      0%,100%{box-shadow:0 4px 14px rgba(192,57,43,.4)}
+      50%    {box-shadow:0 4px 26px rgba(192,57,43,.85)}
+    }
+    #fs-btn:active { transform:scale(.95); }
+    #loading {
+      position:absolute;inset:0;background:#111;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:10px;z-index:4;transition:opacity .6s;
+    }
+    #loading.fade{opacity:0;pointer-events:none;}
+    .spinner{width:38px;height:38px;border:3px solid rgba(255,255,255,.12);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #loading p{color:rgba(255,255,255,.5);font-size:12px;}
+
+    /* ─────────────────────────────────────────────
+       TICKER
+    ───────────────────────────────────────────── */
+    #promo-strip {
+      background: var(--red); color: #fff;
+      font-size:11px; font-weight:700; letter-spacing:.04em;
+      padding:7px 0; overflow:hidden; white-space:nowrap;
+      border-top: 2px solid var(--red-dark);
+    }
+    .ticker-inner { display:inline-block; animation:marquee 22s linear infinite; }
+    @keyframes marquee { 0%{transform:translateX(100vw)} 100%{transform:translateX(-100%)} }
+
+    /* ─────────────────────────────────────────────
+       CONTENT WRAPPER  +  SECTION LABELS
+    ───────────────────────────────────────────── */
+    #content {
+      padding: 0 0 20px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* Every card-like section gets a white card with clear separation */
+    .section-wrap {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 16px;
+    }
+    .section-wrap:last-child { border-bottom: none; }
+
+    .section-label {
+      font-size: 9px; font-weight: 700; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--text-xs);
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .section-label::after {
+      content:''; flex:1; height:1px; background: var(--border);
+    }
+
+    /* ─────────────────────────────────────────────
+       PRICE CARD
+    ───────────────────────────────────────────── */
+    .price-card {
+      background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: var(--shadow-m);
+    }
+    .price-label {
+      font-size:10px; color:rgba(255,255,255,.7); font-weight:700;
+      text-transform:uppercase; letter-spacing:.14em; margin-bottom:4px;
+    }
+    .price-amount {
+      font-size:36px; font-weight:900; color:#fff; line-height:1;
+    }
+    .price-amount sup { font-size:16px; vertical-align:super; }
+    .price-note { font-size:10px; color:rgba(255,255,255,.6); margin-top:5px; }
+    .price-icon { font-size:52px; filter: drop-shadow(0 2px 6px rgba(0,0,0,.2)); }
+
+    /* ─────────────────────────────────────────────
+       TAGS / PILLS
+    ───────────────────────────────────────────── */
+    .tags { display:flex; flex-wrap:wrap; gap:7px; }
+    .tag-pill {
+      background: var(--surface2); border: 1.5px solid var(--border2);
+      color: var(--text-b); font-size:11px; font-weight:600;
+      padding: 6px 13px; border-radius:20px;
+    }
+    .tag-pill.hot {
+      background: var(--red-light); border-color: var(--red);
+      color: var(--red-dark);
+    }
+
+    /* ─────────────────────────────────────────────
+       FEATURES
+    ───────────────────────────────────────────── */
+    .features {
+      background: var(--yellow-bg);
+      border: 1.5px solid #f5c98a;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    .features h3 {
+      font-size: 10px; font-weight: 700; color: var(--yellow);
+      text-transform: uppercase; letter-spacing: .15em; margin-bottom: 10px;
+    }
+    .feat-row {
+      display:flex; align-items:center; gap:11px;
+      padding: 8px 0; border-bottom: 1px solid #f0dbb5;
+      font-size:13px; color: var(--text-b); font-weight:500;
+    }
+    .feat-row:last-child { border-bottom:none; padding-bottom:0; }
+    .feat-row .icon { font-size:18px; width:26px; text-align:center; flex-shrink:0; }
+
+    /* ─────────────────────────────────────────────
+       CLOUD MESSENGER
+    ───────────────────────────────────────────── */
+    #chat-section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-s);
+      border: 1.5px solid var(--border);
+    }
+    #chat-header {
+      background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+      padding: 11px 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .chat-avatar {
+      width:36px; height:36px; border-radius:50%;
+      background: rgba(255,255,255,.2);
+      border: 2px solid rgba(255,255,255,.4);
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; flex-shrink:0;
+    }
+    .chat-name { font-size:13px; font-weight:700; color:#fff; }
+    .chat-status { font-size:10px; color:rgba(255,255,255,.8); margin-top:1px; }
+    .online-dot {
+      display:inline-block; width:7px; height:7px;
+      background:#4ade80; border-radius:50%;
+      margin-right:4px; animation:blink 1.5s infinite;
+    }
+
+    #name-row {
+      display:flex; gap:8px; padding:10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    #sender-name {
+      flex:1; background: var(--surface); border: 1.5px solid var(--border2);
+      border-radius:20px; padding:7px 14px;
+      color: var(--text-h); font-size:12px; font-family:'Poppins',sans-serif;
+      outline:none;
+    }
+    #sender-name:focus { border-color: var(--red); }
+    #sender-name::placeholder { color: var(--text-xs); }
+
+    #chat-messages {
+      padding:12px;
+      display:flex; flex-direction:column; gap:8px;
+      max-height:240px; overflow-y:auto;
+      background: #faf9f6;
+    }
+    .msg { display:flex; gap:8px; align-items:flex-end; }
+    .msg.user { flex-direction:row-reverse; }
+    .bubble {
+      max-width:78%; padding:9px 13px; border-radius:14px;
+      font-size:12px; line-height:1.55;
+    }
+    .msg.seller .bubble {
+      background: var(--surface); color: var(--text-b);
+      border: 1px solid var(--border);
+      border-bottom-left-radius:4px;
+      box-shadow: var(--shadow-s);
+    }
+    .msg.user .bubble {
+      background: var(--green); color:#fff;
+      border-bottom-right-radius:4px;
+    }
+    .msg-avatar {
+      width:28px; height:28px; border-radius:50%;
+      background: var(--border); display:flex;
+      align-items:center; justify-content:center;
+      font-size:14px; flex-shrink:0;
+    }
+    .msg-meta { font-size:9px; color: var(--text-xs); margin-top:3px; padding:0 4px; }
+    .msg.user .msg-meta { text-align:right; }
+
+    .typing { display:flex;gap:4px;align-items:center;padding:10px 14px; background:#faf9f6; }
+    .typing span {
+      width:7px;height:7px; background: var(--border2);
+      border-radius:50%; animation:bounce .9s infinite;
+    }
+    .typing span:nth-child(2){animation-delay:.15s}
+    .typing span:nth-child(3){animation-delay:.3s}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    .typing.hidden{display:none;}
+
+    #chat-input-row {
+      display:flex; gap:8px; padding:10px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    #chat-input {
+      flex:1; background: var(--surface2);
+      border: 1.5px solid var(--border2);
+      border-radius:20px; padding:8px 14px;
+      color: var(--text-h); font-size:13px;
+      font-family:'Poppins',sans-serif; outline:none;
+    }
+    #chat-input:focus { border-color: var(--green); }
+    #chat-input::placeholder { color: var(--text-xs); }
+    #send-btn {
+      background: var(--green); border:none; border-radius:50%;
+      width:38px; height:38px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:17px; flex-shrink:0; color:#fff;
+      box-shadow: 0 3px 10px rgba(26,122,63,.35);
+    }
+    #send-btn:active{transform:scale(.92);}
+    .chat-notice {
+      font-size:10px; color: var(--text-xs); text-align:center;
+      padding: 6px 12px 10px; border-top: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    /* ─────────────────────────────────────────────
+       QUICK REPLIES
+    ───────────────────────────────────────────── */
+    #quick-replies { display:flex; flex-wrap:wrap; gap:7px; }
+    #quick-replies .tag-pill {
+      background: var(--green-bg);
+      border: 1.5px solid #a7d9bb;
+      color: var(--green);
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: background .15s;
+    }
+    #quick-replies .tag-pill:active { background: #d0f0de; }
+
+    /* ─────────────────────────────────────────────
+       CTA BUTTONS
+    ───────────────────────────────────────────── */
+    .cta-group { display:flex; flex-direction:column; gap:10px; }
+    .btn {
+      display:flex; align-items:center; justify-content:center; gap:9px;
+      padding: 15px; border-radius: 13px; font-size:15px; font-weight:700;
+      font-family:'Poppins',sans-serif; cursor:pointer;
+      text-decoration:none; border:none; transition:transform .12s, box-shadow .12s;
+    }
+    .btn:active { transform:scale(.97); }
+    .btn-green {
+      background: linear-gradient(135deg, #1a7a3f, #145c30);
+      color:#fff; box-shadow: 0 4px 18px rgba(26,122,63,.35);
+    }
+    .btn-blue {
+      background: linear-gradient(135deg, #1a5fa8, #134a87);
+      color:#fff; box-shadow: 0 4px 18px rgba(26,95,168,.3);
+    }
+    .btn-red {
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      color:#fff; box-shadow: 0 4px 18px rgba(192,57,43,.3);
+    }
+
+    /* ─────────────────────────────────────────────
+       SELLER CARD
+    ───────────────────────────────────────────── */
+    .seller-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display:flex; align-items:center; gap:13px;
+      box-shadow: var(--shadow-s);
+    }
+    .seller-avatar {
+      width:50px; height:50px; border-radius:50%;
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      display:flex; align-items:center; justify-content:center;
+      font-size:24px; flex-shrink:0;
+      box-shadow: 0 3px 10px rgba(192,57,43,.3);
+    }
+    .seller-name { font-size:14px; font-weight:700; color: var(--text-h); }
+    .seller-sub  { font-size:11px; color: var(--text-m); margin-top:2px; }
+    .verified {
+      display:inline-flex; align-items:center; gap:4px;
+      background: var(--green-bg); color: var(--green);
+      border: 1px solid #a7d9bb;
+      font-size:9px; font-weight:700;
+      padding:3px 9px; border-radius:10px; margin-top:5px;
+      letter-spacing:.07em;
+    }
+
+    /* ─────────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────────── */
+    #footer {
+      text-align:center; padding:16px 12px;
+      font-size:10px; color: var(--text-xs);
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    /* ─────────────────────────────────────────────
+       LOCATION PILL
+    ───────────────────────────────────────────── */
+    .location-pill {
+      cursor: pointer;
+      background: var(--blue-bg);
+      border-color: #9bc0e8;
+      color: var(--blue);
+      font-family: 'Poppins', sans-serif;
+      animation: glow-pill 2.5s infinite;
+    }
+    @keyframes glow-pill {
+      0%,100% { box-shadow: 0 0 0 rgba(26,95,168,0); }
+      50%      { box-shadow: 0 0 10px rgba(26,95,168,.2); }
+    }
+
+    /* ─────────────────────────────────────────────
+       MAP MODAL
+    ───────────────────────────────────────────── */
+    #map-modal {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    #map-modal.open { display: flex; }
+    #map-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; overflow: hidden;
+      width: 100%; max-width: 460px;
+      box-shadow: var(--shadow-l);
+      animation: pop-in 0.22s ease;
+    }
+    @keyframes pop-in {
+      from { transform: scale(0.9); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    #map-header {
+      background: linear-gradient(135deg, var(--blue), #134a87);
+      padding: 13px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    #map-header .map-title { font-size: 14px; font-weight: 700; color:#fff; }
+    #map-header .map-sub   { font-size: 11px; color: rgba(255,255,255,.75); margin-top: 2px; }
+    #close-map {
+      background: rgba(255,255,255,.18); border: none; color: #fff;
+      width: 30px; height: 30px; border-radius: 50%; font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    #map-frame { width:100%; height:260px; border:none; display:block; }
+    #map-footer { padding:12px 16px; display:flex; gap:8px; background: var(--surface); }
+    .map-btn {
+      flex:1; padding:11px; border-radius:10px;
+      font-size:13px; font-weight:700; font-family:'Poppins',sans-serif;
+      border:none; cursor:pointer; text-decoration:none;
+      text-align:center; display:flex; align-items:center;
+      justify-content:center; gap:5px;
+    }
+    .map-btn-blue { background: var(--blue); color: #fff; }
+    .map-btn-dark { background: var(--surface2); border: 1.5px solid var(--border2); color: var(--text-b); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div class="sub">🐷 Gikan sa Kaugalingon backyard</div>
+  <h1>Baboy Para <span>Ibaligya!</span></h1>
+  <div class="live-badge"><div class="live-dot"></div> For Sale!</div>
+</div>
+
+<!-- VIDEO -->
+<div id="video-wrap">
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Gi-load ang video…</p>
+  </div>
+  <!-- tap blocker hides iframe controls on touch -->
+  <div id="tap-block"></div>
+  <!-- fullscreen button -->
+  <button id="fs-btn" onclick="openFS()">⛶ FULLSCREEN</button>
+</div>
+
+<!-- TICKER -->
+<div id="promo-strip">
+  <span class="ticker-inner">🐷 BABOY BALIGYA! &nbsp;•&nbsp; SAKTOG BAHOG UG HIMSOG &nbsp;•&nbsp; GIBUHI SA BACKYARD &nbsp;•&nbsp; PARA SA KASAL, BIRTHDAY, BUNYAG UG UBAN PANG CELEBRASYON!&nbsp;•&nbsp; SA MAKA-UNA LANG &nbsp;•&nbsp; 🐷 BABOY BALIGYA! &nbsp;•&nbsp; HIMSOG &nbsp;•&nbsp; GIBUHI SA BACKYARD &nbsp;•&nbsp; PARA SA KASAL, BIRTHDAY, BUNYAG UG UBAN PANG CELEBRASYON!&nbsp;•&nbsp; SA MAKA-UNA LANG</span>
+</div>
+
+<!-- CONTENT -->
+<div id="content">
+
+  <!-- Price -->
+  <div class="section-wrap">
+    <div class="section-label">💰 Presyo</div>
+    <div class="price-card">
+      <div>
+        <div class="price-label">Presyo</div>
+        <div class="price-amount"><sup></sup>TAWAD</div>
+        <div class="price-note">Sabot-sabot lang · Mag-message para sa mga pangutana</div>
+      </div>
+      <div class="price-icon">🐷</div>
+    </div>
+  </div>
+
+  <!-- Tags -->
+  <div class="section-wrap">
+    <div class="section-label">📌 Impormasyon</div>
+    <div class="tags">
+      <span class="tag-pill">🔥 Ikaw pay naka-una, kumpasi na!</span>
+      <span class="tag-pill">✅ Location: Zone 4, Lumbo, Lagonglong</span>
+      <button class="tag-pill location-pill" onclick="showMap()">📍 Location map</button>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section-wrap">
+    <div class="section-label">😂 Ayaw na'g dugay!!!</div>
+    <div class="features">
+      <h3>🔥 Palita na bay!!!</h3>
+      <div class="feat-row"><span class="icon">🏠</span> Single pa ka? Palit sa baboy una, ang uyab sunod na. 😆</div>
+      <div class="feat-row"><span class="icon">💪</span> Pakasal na Loy, mitras nia pa ning baboy! 🐷😂</div>
+      <div class="feat-row"><span class="icon">🌾</span> katung wala pay uyab, baboy nalang unaha para pagkasal ready na.😂 </div>
+    </div>
+  </div>
+
+  <!-- CLOUD MESSENGER -->
+  <div class="section-wrap">
+    <div class="section-label">💬 I-message ang Nagbaligya</div>
+    <div id="chat-section">
+      <div id="chat-header">
+        <div class="chat-avatar">🐷</div>
+        <div>
+          <div class="chat-name">RekzBanz ang tag-iya</div>
+          <div class="chat-status"><span class="online-dot"></span>Online karon</div>
+        </div>
+      </div>
+      <!-- Sender name input -->
+      <div id="name-row">
+        <input id="sender-name" type="text" placeholder="Isulod ang imong ngalan…" autocomplete="off" maxlength="30" />
+      </div>
+      <div id="chat-messages">
+        <!-- messages load here -->
+      </div>
+      <div class="typing hidden" id="typing">
+        <span></span><span></span><span></span>
+      </div>
+      <div id="chat-input-row">
+        <input id="chat-input" type="text" placeholder="Mangutana dinhi…" autocomplete="off" />
+        <button id="send-btn" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick reply buttons -->
+  <div class="section-wrap">
+    <div class="section-label">⚡ Quick Questions</div>
+    <div id="quick-replies">
+      <button class="tag-pill" onclick="quickSend('Pila ang presyo?')">💰 Tagpila ang kilo?</button>
+      <button class="tag-pill" onclick="quickSend('Pila ka kilo ang baboy?')">⚖️ Pila ka kilo?</button>
+      <button class="tag-pill" onclick="quickSend('Asa mo makita?')">📍 Asa ang lokasyon?</button>
+      <button class="tag-pill" onclick="quickSend('Dili ko sa baboy, ikaw akong gusto 🥰')">👀 Dili ko sa baboy, ikaw akong tuyo.🥰</button>
+    </div>
+  </div>
+
+  <!-- CTA Buttons -->
+  <div class="section-wrap">
+    <div class="section-label">📞 Makig-ugnong Direkta</div>
+    <div class="cta-group">
+      <a class="btn btn-green" href="https://m.me/rekzbanz02" target="_blank">💬 Mag-message sa Messenger</a>
+      <a class="btn btn-blue"  href="https://wa.me/639932629488" target="_blank">📲 Mag-chat sa WhatsApp</a>
+      <a class="btn btn-red"   href="tel:+639932629488">📞 Tawag Karon</a>
+    </div>
+  </div>
+
+  <!-- Seller -->
+  <div class="section-wrap">
+    <div class="section-label">🏪 Ang Nagbaligya</div>
+    <div class="seller-card">
+      <div class="seller-avatar">🐷</div>
+      <div>
+        <div class="seller-name">RSSR Gaming Zone</div>
+        <div class="seller-sub">Nagbaligya · Lagonglong, Misamis Oriental</div>
+        <div class="verified">✓ Kasaligan nga Nagbaligya</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div id="footer">© 2026 · Ad ni RekzBanz · Tanan nga katungod gitagana</div>
+
+<script>
+  // ─── FILE ID ─────────────────────────────────────────────────────────────────
+  const FILE_ID = "12r-oxwIeHfD3L4fvr9V0K8AtnGGzorKG";
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // Build iframe using Google Drive embed (most compatible)
+  const wrap    = document.getElementById("video-wrap");
+  const loading = document.getElementById("loading");
+  const iframe  = document.createElement("iframe");
+  // Use /preview — works on mobile browsers without sign-in
+  iframe.src    = `https://drive.google.com/file/d/${FILE_ID}/preview`;
+  iframe.allow  = "autoplay; fullscreen; picture-in-picture";
+  iframe.setAttribute("allowfullscreen", "");
+  iframe.setAttribute("allowtransparency", "true");
+  wrap.insertBefore(iframe, loading);
+
+  // Give Drive extra time to load on mobile
+  setTimeout(() => {
+    loading.classList.add("fade");
+    setTimeout(() => loading.style.display = "none", 600);
+  }, 3500);
+  
+  // Retry if iframe seems stuck — reload src after 8s
+  setTimeout(() => {
+    if (document.getElementById("loading") && 
+        !document.getElementById("loading").classList.contains("fade")) {
+      iframe.src = iframe.src; // reload
+    }
+  }, 8000);
+
+  // Fullscreen
+  function openFS() {
+    const el = wrap;
+    (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).call(el);
+  }
+  document.addEventListener("fullscreenchange", () => {
+    document.getElementById("fs-btn").style.display =
+      document.fullscreenElement ? "none" : "flex";
+  });
+
+  // ── JSONBIN CLOUD MESSENGER ──────────────────────────────────────────────────
+  const BIN_ID     = "6a3f7cd6da38895dfe066189";
+  const MASTER_KEY = "$2a$10$QRwVf3OgkrsAGNkRCgouRebBADnAcFGs/l8ZzN8YICcI7/NCaf3Ia";
+  const BIN_URL    = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+  const HEADERS_READ  = { "X-Master-Key": MASTER_KEY };
+  const HEADERS_WRITE = { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY };
+
+  let lastMsgCount = 0;
+  let pollTimer    = null;
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function fmtTime(ts) {
+    const d = new Date(ts);
+    return d.toLocaleTimeString("en-PH", { hour:"2-digit", minute:"2-digit" });
+  }
+
+  function renderMessages(msgs) {
+    const box = document.getElementById("chat-messages");
+    if (msgs.length === lastMsgCount) return; // nothing new
+    lastMsgCount = msgs.length;
+    box.innerHTML = "";
+    msgs.forEach(m => {
+      const isUser   = m.role === "user";
+      const isSeller = m.role === "seller";
+      const div = document.createElement("div");
+      div.className = `msg ${isUser ? "user" : "seller"}`;
+
+      const av  = document.createElement("div");
+      av.className = "msg-avatar";
+      av.textContent = isUser ? "👤" : "🐷";
+
+      const wrap = document.createElement("div");
+
+      const bub = document.createElement("div");
+      bub.className = "bubble";
+      bub.textContent = (isUser ? `${m.sender}: ` : "") + m.text;
+
+      const meta = document.createElement("div");
+      meta.className = "msg-meta";
+      meta.textContent = fmtTime(m.ts);
+
+      wrap.appendChild(bub);
+      wrap.appendChild(meta);
+      div.appendChild(av);
+      div.appendChild(wrap);
+      box.appendChild(div);
+    });
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // ── Fetch messages from JSONbin ────────────────────────────────────────────
+  async function fetchMessages() {
+    try {
+      const r = await fetch(BIN_URL + "/latest", { headers: HEADERS_READ });
+      if (!r.ok) return;
+      const data = await r.json();
+      const msgs = data.record?.messages || [];
+      renderMessages(msgs);
+    } catch(e) { /* silent */ }
+  }
+
+  // ── Send message ───────────────────────────────────────────────────────────
+  async function sendMsg() {
+    const input  = document.getElementById("chat-input");
+    const nameEl = document.getElementById("sender-name");
+    const text   = input.value.trim();
+    const sender = nameEl.value.trim() || "Bisita";
+    if (!text) return;
+
+    input.value = "";
+    input.disabled = true;
+    document.getElementById("send-btn").disabled = true;
+
+    // Show typing indicator
+    document.getElementById("typing").classList.remove("hidden");
+
+    try {
+      // 1. Get current bin content
+      const r1   = await fetch(BIN_URL + "/latest", { headers: HEADERS_READ });
+      const data = await r1.json();
+      const msgs = data.record?.messages || [];
+
+      // 2. Append new message
+      msgs.push({ role:"user", sender, text, ts: Date.now() });
+
+      // 3. Write back
+      await fetch(BIN_URL, {
+        method:  "PUT",
+        headers: HEADERS_WRITE,
+        body:    JSON.stringify({ messages: msgs })
+      });
+
+      renderMessages(msgs);
+    } catch(e) {
+      appendSystemMsg("⚠️ Dili ma-send ang mensahe. Check ang internet.");
+    } finally {
+      document.getElementById("typing").classList.add("hidden");
+      input.disabled = false;
+      document.getElementById("send-btn").disabled = false;
+      input.focus();
+    }
+  }
+
+  function appendSystemMsg(txt) {
+    const box = document.getElementById("chat-messages");
+    const p   = document.createElement("p");
+    p.style.cssText = "font-size:10px;color:#6b7280;text-align:center;padding:4px 0;";
+    p.textContent   = txt;
+    box.appendChild(p);
+    box.scrollTop   = box.scrollHeight;
+  }
+
+  function quickSend(msg) {
+    document.getElementById("chat-input").value = msg;
+    sendMsg();
+  }
+
+  // ── Boot ───────────────────────────────────────────────────────────────────
+  fetchMessages();                       // initial load
+  pollTimer = setInterval(fetchMessages, 8000); // poll every 8s
+
+  document.getElementById("chat-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") sendMsg();
+  });
+</script>
+
+<!-- LOCATION MAP MODAL -->
+<div id="map-modal" onclick="closeMapOutside(event)">
+  <div id="map-box">
+    <div id="map-header">
+      <div>
+        <div class="map-title">📍 Asa Kami Makita</div>
+        <div class="map-sub">Lagonglong, Misamis Oriental</div>
+      </div>
+      <button id="close-map" onclick="closeMap()">✕</button>
+    </div>
+    <iframe
+      id="map-frame"
+      src="https://www.google.com/maps?q=8.8063529,124.7974308&z=17&output=embed"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+    <div id="map-footer">
+      <a class="map-btn map-btn-blue"
+         href="https://www.google.com/maps?q=8.8063529,124.7974308"
+         target="_blank">
+        🗺️ Buksan sa Maps
+      </a>
+      <button class="map-btn map-btn-dark" onclick="closeMap()">✕ Sirado</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showMap() {
+    document.getElementById("map-modal").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeMap() {
+    document.getElementById("map-modal").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  function closeMapOutside(e) {
+    if (e.target === document.getElementById("map-modal")) closeMap();
+  }
+</script>
+</body>
+</html>
